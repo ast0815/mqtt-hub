@@ -30,3 +30,6 @@ class SubscriptionTests(TestCase):
         msg = MQTTMessage.objects.last()
         self.assertEqual(msg.topic, test_topic)
         self.assertEqual(msg.payload, test_payload)
+
+    def test_connection(self):
+        MQTTSubscription.subscribe_all(start_loop=False)
