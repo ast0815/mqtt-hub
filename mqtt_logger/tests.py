@@ -6,12 +6,17 @@ class SubscriptionTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        sub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/#')
-        sub.save()
-        cls.sub = sub
+        activesub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/active')
+        activesub.save()
+        cls.activesub = activesub
+        inactivesub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/inactive', active=False)
+        inactivesub.save()
+        cls.activesub = inactivesub
 
     def test_callback_function(self):
-        sub = type(self).sub
+        """Test whether the callback function adds new messages."""
+
+        sub = type(self).activesub
 
         # Create a message to save
         class ToyMessage():
@@ -32,4 +37,7 @@ class SubscriptionTests(TestCase):
         self.assertEqual(msg.payload, test_payload)
 
     def test_connection(self):
-        MQTTSubscription.subscribe_all(start_loop=False)
+        """Test whether one connection is established for each active subscription."""
+
+        clients = MQTTSubscription.subscribe_all(start_loop=False)
+        self.assertEqual(len(clients), 1)

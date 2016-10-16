@@ -14,6 +14,7 @@ class MQTTSubscription(models.Model):
     client_id = models.CharField('Client ID', max_length=1024, blank=True, default='')
     qos = models.PositiveSmallIntegerField('Quality of service', default=0, validators=[MaxValueValidator(2)])
     keep_alive = models.PositiveSmallIntegerField('Client timeout value', default=60)
+    active = models.BooleanField('Active', default=True)
 
     def _record_message_callback(self, client, userdata, message):
         """Save an MQTT message in the database.
@@ -25,11 +26,11 @@ class MQTTSubscription(models.Model):
         msg.save()
 
     @classmethod
-    def subscribe_all(klass, **kwargs):
+    def subscribe_all(cls, **kwargs):
         """Connect and subscribe to all subscriptions in the database."""
 
         clients = []
-        for sub in klass.objects.all():
+        for sub in cls.objects.filter(active=True):
             clients.append(sub.subscribe(**kwargs))
 
         return clients
@@ -59,7 +60,10 @@ class MQTTSubscription(models.Model):
         return client
 
     def __unicode__(self):
-        return "%s: %s"%(self.server, self.topic)
+        if self.active:
+            return "%s: %s"%(self.server, self.topic)
+        else:
+            return "[%s: %s]"%(self.server, self.topic)
 
 class MQTTMessage(models.Model):
     """Base class to store all MQTT messages"""
