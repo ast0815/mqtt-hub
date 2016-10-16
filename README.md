@@ -11,12 +11,8 @@ Usage
 
 The admin interface can be tested by running `./managy.py runserver`.
 
-The connection to actual MQTT brokers works by adding subscriptions to the database and then starting the subscription loops.
+The connection to actual MQTT brokers works by adding subscriptions to the database and then starting the listener.
 
-    $ .\manage.py shell
-
-    In [1]: from mqtt_logger.models import *
-
-    In [2]: clients = MQTTSubscription.subscribe_all()
+    $ .\manage.py runmqttlistener
 
 Messages send over brokers in topics that were subscribed to should now be saved in the database.

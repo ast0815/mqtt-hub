@@ -51,6 +51,11 @@ class MQTTSubscription(models.Model):
         if start_loop:
             client.loop_start()
 
+        # Add additional information to the client object
+        client.host = self.server
+        client.port = self.port
+        client.topics = [self.topic]
+
         return client
 
     def __unicode__(self):
