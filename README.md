@@ -1,4 +1,4 @@
-mqtt-hub
+mqtt-hubi [![Build Status](https://travis-ci.org/ast0815/mqtt-hub.svg?branch=master)](https://travis-ci.org/ast0815/mqtt-hub)
 ========
 
 A web interface and logger for MQTT, based on Django
