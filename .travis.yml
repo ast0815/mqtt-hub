@@ -6,12 +6,6 @@ python:
 # We don't need sudo
 sudo: false
 
-# Install additional packages
-addons:
-  apt:
-    packages:
-      - mosquitto
-
 # command to install dependencies
 install:
   - pip install -r requirements.txt

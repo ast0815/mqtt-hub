@@ -6,7 +6,7 @@ class SubscriptionTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        sub = MQTTSubscription(server='localhost', topic='#')
+        sub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/#')
         sub.save()
         cls.sub = sub
 
