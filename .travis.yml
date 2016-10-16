@@ -12,7 +12,7 @@ install:
 
 # command to run tests
 script:
-  - coverage run --include './*' --omit 'manage.py' -m manage test
+  - coverage run --include './*' --omit 'manage.py' --source '.' -m manage test
 
 # command to run after tests
 after_success:
