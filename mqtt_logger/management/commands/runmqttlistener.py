@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from mqtt_logger.models import *
 
+import time
 
 class Command(BaseCommand):
     help = 'Start listening to mqtt subscriptions and save messages in database.'
@@ -10,10 +11,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Starting MQTT listener...")
-        clients = MQTTSubscription.subscribe_all(start_loop=True)
-        for c in clients:
-            self.stdout.write("  %s:%s %s"%(c.host, c.port, c.topics))
-        self.stdout.write("MQTT listener started.")
-        self.stdout.write("Hit <ENTER> to quit.")
-        wait = raw_input()
-
+        subs = list(MQTTSubscription.objects.filter(active=True))
+        for s in subs:
+            self.stdout.write("  Connecting to %s:%s %s"%(s.server, s.port, s.topic))
+            s.client = s.subscribe(start_loop=True)
+        while(True):
+            time.sleep(10)
+            newsubs = MQTTSubscription.objects.filter(active=True)
+            for s in subs:
+                if s not in newsubs:
+                    self.stdout.write("  Disconnecting from %s:%s %s"%(s.server, s.port, s.topic))
+                    s.client.disconnect()
+                    subs.remove(s)
+            for s in newsubs:
+                if s not in subs:
+                    self.stdout.write("  Connecting to %s:%s %s"%(s.server, s.port, s.topic))
+                    s.client = s.subscribe(start_loop=True)
+                    subs.append(s)
