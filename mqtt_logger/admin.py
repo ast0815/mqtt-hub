@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import *
+from .models import *
 
 class MessageAdmin(admin.ModelAdmin):
     readonly_fields = ('subscription', 'time_recorded', 'topic', 'payload')

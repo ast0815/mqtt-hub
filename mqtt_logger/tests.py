@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.management import call_command
 
-from models import *
+from .models import *
 
 class SubscriptionTests(TestCase):
 
