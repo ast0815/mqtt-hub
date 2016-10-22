@@ -74,8 +74,5 @@ class ListenerTests(TestCase):
         MQTTSubscription.update_running_subscriptions()
         self.assertEqual(len(MQTTSubscription.running_subscriptions), 1)
 
-        inactivesub.active = False
-        inactivesub.save()
-
-        MQTTSubscription.update_running_subscriptions()
+        MQTTSubscription.stop_running_subscriptions()
         self.assertEqual(len(MQTTSubscription.running_subscriptions), 0)
