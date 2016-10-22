@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.management import call_command
 
 from models import *
 
@@ -41,3 +42,40 @@ class SubscriptionTests(TestCase):
 
         clients = MQTTSubscription.subscribe_all(start_loop=False)
         self.assertEqual(len(clients), 1)
+
+class ListenerTests(TestCase):
+
+    def setUp(self):
+        activesub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/active')
+        activesub.save()
+        self.activesub = activesub
+        inactivesub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/inactive', active=False)
+        inactivesub.save()
+        self.inactivesub = inactivesub
+
+    def test_listener_methods(self):
+        """Test whether the subscription listener methods work."""
+
+        activesub = self.activesub
+        inactivesub = self.inactivesub
+
+        MQTTSubscription.update_running_subscriptions()
+        self.assertEqual(len(MQTTSubscription.running_subscriptions), 1)
+
+        inactivesub.active = True
+        inactivesub.save()
+
+        MQTTSubscription.update_running_subscriptions()
+        self.assertEqual(len(MQTTSubscription.running_subscriptions), 2)
+
+        activesub.active = False
+        activesub.save()
+
+        MQTTSubscription.update_running_subscriptions()
+        self.assertEqual(len(MQTTSubscription.running_subscriptions), 1)
+
+        inactivesub.active = False
+        inactivesub.save()
+
+        MQTTSubscription.update_running_subscriptions()
+        self.assertEqual(len(MQTTSubscription.running_subscriptions), 0)

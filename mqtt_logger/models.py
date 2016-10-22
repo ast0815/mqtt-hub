@@ -25,6 +25,35 @@ class MQTTSubscription(models.Model):
         msg = MQTTMessage(subscription=self, topic=message.topic, payload=message.payload)
         msg.save()
 
+    running_subscriptions = []
+
+    @classmethod
+    def update_running_subscriptions(cls):
+        """Connect to all active subscription and disconnect from inactive ones."""
+
+        newsubs = cls.objects.filter(active=True)
+
+        # Disconnect from inactive subs
+        for s in cls.running_subscriptions:
+            if s not in newsubs:
+                s.client.disconnect()
+                cls.running_subscriptions.remove(s)
+
+        # Connect to active subs
+        for s in newsubs:
+            if s not in cls.running_subscriptions:
+                s.client = s.subscribe(start_loop=True)
+                cls.running_subscriptions.append(s)
+
+    @classmethod
+    def stop_running_subscriptions(cls):
+        """Stop all running subscrptions."""
+
+        for s in cls.running_subscriptions:
+            s.client.disconnect()
+
+        cls.running_subscriptions = []
+
     @classmethod
     def subscribe_all(cls, **kwargs):
         """Connect and subscribe to all subscriptions in the database."""
