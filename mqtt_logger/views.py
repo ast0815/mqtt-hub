@@ -31,6 +31,10 @@ class MessageView(PandasView):
         """
 
         topic = self.kwargs['topic']
+        # Replace '+' and '#' with standard regular expression
+        topic = topic.replace(r'+', r'[^/]*')
+        topic = topic.replace(r'#', r'.*')
+        topic = r'^' + topic + r'$'
 
         default_limit = 100
         max_limit = 1000
@@ -50,7 +54,7 @@ class MessageView(PandasView):
         if skip < 0:
             skip = 0
 
-        return MQTTMessage.objects.filter(topic=topic).order_by('-time_recorded')[skip:skip+limit]
+        return MQTTMessage.objects.filter(topic__regex=topic).order_by('-time_recorded')[skip:skip+limit]
 
     serializer_class = MessageSerializer
     renderer_classes = [PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer]

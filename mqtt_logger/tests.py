@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+import urllib
 
 from .models import *
 
@@ -98,6 +99,10 @@ class RESTTests(TestCase):
         for payload in ('_A_', '_B_', '_C_'):
             msg = MQTTMessage(subscription=sub, topic=topic, payload=payload)
             msg.save()
+        for level in ('A', 'B', 'C'):
+            topic = topic + '/' + level
+            msg = MQTTMessage(subscription=sub, topic=topic, payload='_'+level+'_')
+            msg.save()
 
     def setUp(self):
         """Create a client and other stuff that will be needed for view testing."""
@@ -140,26 +145,51 @@ class RESTTests(TestCase):
         """Test whether `limit` and `skip` are working."""
 
         client = self.client
+        url = type(self).url
 
         # Negative or garbage value should lead to defaul values
-        response = client.get(type(self).url, {'skip': 'x', 'limit': 'x'})
+        response = client.get(url, {'skip': 'x', 'limit': 'x'})
         self.assertIn('_A_', response.content)
         self.assertIn('_B_', response.content)
         self.assertIn('_C_', response.content)
 
-        response = client.get(type(self).url, {'skip': '-1', 'limit': '-1'})
+        response = client.get(url, {'skip': '-1', 'limit': '-1'})
         self.assertIn('_A_', response.content)
         self.assertIn('_B_', response.content)
         self.assertIn('_C_', response.content)
 
         # Only newest message should be returned
-        response = client.get(type(self).url, {'limit': '1'})
+        response = client.get(url, {'limit': '1'})
         self.assertNotIn('_A_', response.content)
         self.assertNotIn('_B_', response.content)
         self.assertIn('_C_', response.content)
 
         # Second to newest
-        response = client.get(type(self).url, {'skip': '1', 'limit': '1'})
+        response = client.get(url, {'skip': '1', 'limit': '1'})
         self.assertNotIn('_A_', response.content)
         self.assertIn('_B_', response.content)
         self.assertNotIn('_C_', response.content)
+
+    def test_regex(self):
+        """Test whether topic matching with '+' and '#' works."""
+
+        client = self.client
+        url = type(self).url + '/A'
+
+        # First level should only contain the '_A_' message
+        response = client.get(url)
+        self.assertIn('_A_', response.content)
+        self.assertNotIn('_B_', response.content)
+        self.assertNotIn('_C_', response.content)
+
+        # Second level should only contain the '_B_' message
+        response = client.get(url+ '/+')
+        self.assertNotIn('_A_', response.content)
+        self.assertIn('_B_', response.content)
+        self.assertNotIn('_C_', response.content)
+
+        # Second and third level should contain the '_B_' and '_C_' messages
+        response = client.get(url+ urllib.quote('/#'))
+        self.assertNotIn('_A_', response.content)
+        self.assertIn('_B_', response.content)
+        self.assertIn('_C_', response.content)
