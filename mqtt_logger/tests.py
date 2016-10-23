@@ -4,9 +4,12 @@ from django.core.management import call_command
 from .models import *
 
 class SubscriptionTests(TestCase):
+    """General tests for the subscription models"""
 
     @classmethod
     def setUpTestData(cls):
+        """Create an active and an inactive subscription."""
+
         activesub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/active')
         activesub.save()
         cls.activesub = activesub
@@ -44,8 +47,11 @@ class SubscriptionTests(TestCase):
         self.assertEqual(len(clients), 1)
 
 class ListenerTests(TestCase):
+    """Tests for the MQTT listener"""
 
     def setUp(self):
+        """Create an active and an inactive subscription"""
+
         activesub = MQTTSubscription(server='broker.hivemq.com', topic='mqtt-hub/tests/active')
         activesub.save()
         self.activesub = activesub
