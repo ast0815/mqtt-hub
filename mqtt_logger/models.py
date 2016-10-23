@@ -8,6 +8,10 @@ import paho.mqtt.client as mqtt
 class MQTTSubscription(models.Model):
     """Subscriptions define which MQTT messages are to be recorded."""
 
+    class Meta():
+        verbose_name = "MQTT subscription"
+        verbose_name_plural = "MQTT subscriptions"
+
     server = models.CharField('Server name', max_length=200)
     topic = models.CharField('Topic subscribed to', max_length=1024)
     port = models.PositiveSmallIntegerField('Server port', default=1883)
@@ -96,6 +100,10 @@ class MQTTSubscription(models.Model):
 
 class MQTTMessage(models.Model):
     """Base class to store all MQTT messages"""
+
+    class Meta():
+        verbose_name = "MQTT message"
+        verbose_name_plural = "MQTT messages"
 
     time_recorded = models.DateTimeField('Time recorded', auto_now_add=True, editable=False)
     subscription = models.ForeignKey(MQTTSubscription, on_delete=models.PROTECT, editable=False)
