@@ -16,3 +16,9 @@ The connection to actual MQTT brokers works by adding subscriptions to the datab
     $ .\manage.py runmqttlistener
 
 Messages send over brokers in topics that were subscribed to should now be saved in the database.
+
+The messages can be accessed via a REST API:
+
+    http://localhost:8000/mqtt/messages/topic/you/want?format=txt&limit=5&skip=0
+
+The `format` must be one of 'txt', 'csv', 'json'.
