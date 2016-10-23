@@ -6,6 +6,10 @@ python:
 # We don't need sudo
 sudo: false
 
+# command to run prerequisites
+before_install:
+  - pip install cython
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
