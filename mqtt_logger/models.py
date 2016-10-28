@@ -4,6 +4,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 import paho.mqtt.client as mqtt
+import re
 
 class MQTTSubscription(models.Model):
     """Subscriptions define which MQTT messages are to be recorded."""
@@ -109,6 +110,61 @@ class MQTTMessage(models.Model):
     subscription = models.ForeignKey(MQTTSubscription, on_delete=models.PROTECT, editable=False)
     topic = models.CharField('Topic', max_length=1024, editable=False)
     payload = models.TextField('Payload', max_length=16000, editable=False)
+
+    def search_payload(self, regex):
+        """Search the payload and extract variables from it.
+
+        Uses `re.search` and returns `MatchObject` or `None`.
+        """
+
+        return re.search(regex, self.payload)
+
+    def parse_payload(self, regex):
+        """Parse the payload into a dict of variables.
+
+        The `regex` should contain at least one named group of the form `(?P<d_name>[-+]?\d+)`.
+        The first letter (before the '_') decides how the matched string is interpreted:
+
+            d,i:        int(match)
+            e,E,f,g:    float(match)
+            s           string, i.e. no interpretation
+
+        Named groups that do not start with the 'd_' form are interpreted as strings.
+
+        Returns `None` if the regex does not match, otherwise the dict of the interpreted groups.
+        """
+
+        match = self.search_payload(regex)
+        if match is None:
+            return None
+
+        ret = {}
+        groups = match.groupdict()
+
+        for key in groups:
+            type_match = re.match('([dieEfgs])_(.+)', key)
+            if type_match is None:
+                type_char = 's'
+                group_name = key
+            else:
+                type_char = type_match.group(1)
+                group_name = type_match.group(2)
+
+            if type_char in 'di':
+                # Integer
+                value = int(groups[key])
+            elif type_char in 'eEfg':
+                # Float
+                value = float(groups[key])
+            elif type_char in 's':
+                # String, no parsing needed
+                value = groups[key]
+            else:
+                raise ValueError("Unknown type character <%s>. This should never happen!"%(type_char,))
+
+            ret[group_name] = value
+
+        return ret
 
     def __unicode__(self):
         return "(%s) %s: %s"%(self.time_recorded, self.topic, self.payload[0:16])

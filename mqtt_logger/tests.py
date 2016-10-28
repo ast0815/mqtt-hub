@@ -3,7 +3,42 @@ from django.core.management import call_command
 from django.core.urlresolvers import reverse
 import urllib
 
-from .models import *
+from .models import MQTTMessage, MQTTSubscription
+
+class MessageTests(TestCase):
+    """General tests for the message model"""
+
+    @classmethod
+    def setUpTestData(cls):
+        """Create messages for the tests."""
+
+        topic = 'mqtt-hub/tests'
+        sub = MQTTSubscription(server='broker.hivemq.com', topic=topic)
+        sub.save()
+        for payload in ('2016-10-28_23:23 _A_ 123.45 67', ):
+            msg = MQTTMessage(subscription=sub, topic=topic, payload=payload)
+            msg.save()
+
+    def test_payload_searching(self):
+        """Test the regex search of payload strigns."""
+
+        msg = MQTTMessage.objects.last()
+        match = msg.search_payload('^(?P<time>[\S]+)\s+(?P<string>[\S]+)\s+(?P<float>[0-9.]+)\s+(?P<integer>[0-9]+)')
+        var = match.groupdict()
+        self.assertEqual(var['time'], '2016-10-28_23:23')
+        self.assertEqual(var['string'], '_A_')
+        self.assertEqual(var['float'], '123.45')
+        self.assertEqual(var['integer'], '67')
+
+    def test_payload_parsing(self):
+        """Test the payload parsing into floats, ints, etc."""
+
+        msg = MQTTMessage.objects.last()
+        var = msg.parse_payload('^(?P<time>[\S]+)\s+(?P<s_string>[\S]+)\s+(?P<f_float>[0-9.]+)\s+(?P<d_integer>[0-9]+)')
+        self.assertEqual(var['time'], '2016-10-28_23:23')
+        self.assertEqual(var['string'], '_A_')
+        self.assertAlmostEqual(var['float'], 123.45)
+        self.assertEqual(var['integer'], 67)
 
 class SubscriptionTests(TestCase):
     """General tests for the subscription models"""
