@@ -3,6 +3,7 @@ mqtt-hub
 
 [![Build Status](https://travis-ci.org/ast0815/mqtt-hub.svg?branch=master)](https://travis-ci.org/ast0815/mqtt-hub)
 [![Coverage Status](https://coveralls.io/repos/github/ast0815/mqtt-hub/badge.svg?branch=master)](https://coveralls.io/github/ast0815/mqtt-hub?branch=master)
+[![Requirements Status](https://requires.io/github/ast0815/mqtt-hub/requirements.svg?branch=master)](https://requires.io/github/ast0815/mqtt-hub/requirements/?branch=master)
 
 A web interface and logger for MQTT, based on Django
 
