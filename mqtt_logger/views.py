@@ -5,6 +5,8 @@ from rest_pandas.renderers import PandasCSVRenderer, PandasTextRenderer, PandasJ
 from .models import MQTTMessage
 from .serializers import generate_parsing_serializer_class
 
+import re
+
 class MessageView(PandasView):
     """RESTful view to get a set of MQTT messages
 
@@ -61,7 +63,13 @@ class MessageView(PandasView):
     def get_serializer_class(self):
         """Dynamically create a serializer class using the `parse` query string."""
 
-        cls = generate_parsing_serializer_class(self.request.GET.get('parse', ''))
+        regex = self.request.GET.get('parse', '')
+        try:
+            regex = re.compile(regex)
+        except:
+            regex = re.compile('')
+
+        cls = generate_parsing_serializer_class(regex)
         return self.with_list_serializer(cls)
 
     renderer_classes = [PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer]
