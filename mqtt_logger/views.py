@@ -1,9 +1,9 @@
 from django.shortcuts import render
 
-from rest_pandas import PandasView
+from rest_pandas.views import PandasView
 from rest_pandas.renderers import PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer
 from .models import MQTTMessage
-from .serializers import MessageSerializer
+from .serializers import generate_parsing_serializer_class
 
 class MessageView(PandasView):
     """RESTful view to get a set of MQTT messages
@@ -19,6 +19,8 @@ class MessageView(PandasView):
     * `format`  : Set the file format to be returned. One of 'txt', 'csv', 'json'.
     * `limit`   : Limit the number of returned messages.
     * `skip`    : Skip the first N entries.
+    * `parse`   : Regular expression to parse the messages' payload.
+                  See `MQTTMessage.parse_payload`.
 
     """
 
@@ -56,5 +58,10 @@ class MessageView(PandasView):
 
         return MQTTMessage.objects.filter(topic__regex=topic).order_by('-time_recorded')[skip:skip+limit]
 
-    serializer_class = MessageSerializer
+    def get_serializer_class(self):
+        """Dynamically create a serializer class using the `parse` query string."""
+
+        cls = generate_parsing_serializer_class(self.request.GET.get('parse', ''))
+        return self.with_list_serializer(cls)
+
     renderer_classes = [PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer]
