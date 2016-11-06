@@ -119,6 +119,34 @@ class MQTTMessage(models.Model):
 
         return re.search(regex, self.payload)
 
+    @staticmethod
+    def _parse_group_name(group_name):
+        """Parse the name of a named group for payload parsing.
+
+        Returns (name, type).
+        """
+
+        type_match = re.match('([dieEfgs])_(.+)', group_name)
+        if type_match is None:
+            type_char = 's'
+        else:
+            type_char = type_match.group(1)
+            group_name = type_match.group(2)
+
+        if type_char in 'di':
+            # Integer
+            typ = int
+        elif type_char in 'eEfg':
+            # Float
+            typ = float
+        elif type_char in 's':
+            # String, no parsing needed
+            typ = str
+        else:
+            raise ValueError("Unknown type character <%s>. This should never happen!"%(type_char,))
+
+        return (group_name, typ)
+
     def parse_payload(self, regex):
         """Parse the payload into a dict of variables.
 
@@ -142,27 +170,10 @@ class MQTTMessage(models.Model):
         groups = match.groupdict()
 
         for key in groups:
-            type_match = re.match('([dieEfgs])_(.+)', key)
-            if type_match is None:
-                type_char = 's'
-                group_name = key
-            else:
-                type_char = type_match.group(1)
-                group_name = type_match.group(2)
 
-            if type_char in 'di':
-                # Integer
-                value = int(groups[key])
-            elif type_char in 'eEfg':
-                # Float
-                value = float(groups[key])
-            elif type_char in 's':
-                # String, no parsing needed
-                value = groups[key]
-            else:
-                raise ValueError("Unknown type character <%s>. This should never happen!"%(type_char,))
+            group_name, typ = type(self)._parse_group_name(key)
 
-            ret[group_name] = value
+            ret[group_name] = typ(groups[key])
 
         return ret
 
