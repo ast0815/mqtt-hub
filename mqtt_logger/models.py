@@ -173,7 +173,10 @@ class MQTTMessage(models.Model):
 
             group_name, typ = type(self)._parse_group_name(key)
 
-            ret[group_name] = typ(groups[key])
+            try:
+                ret[group_name] = typ(groups[key])
+            except ValueError:
+                ret[group_name] = None
 
         return ret
 
