@@ -245,7 +245,7 @@ class RESTTests(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual('text/plain', response.accepted_media_type)
         self.assertIn('_A_', response.content)
-        self.assertIn('number', response.content)
+        self.assertIn('parsed_number', response.content)
 
     def test_bad_payload_parsing(self):
         """Test that bad regexes fail gracefully."""
@@ -255,4 +255,4 @@ class RESTTests(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual('text/plain', response.accepted_media_type)
         self.assertIn('_A_', response.content)
-        self.assertNotIn('number', response.content)
+        self.assertNotIn('parsed_number', response.content)
