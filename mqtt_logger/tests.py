@@ -40,6 +40,14 @@ class MessageTests(TestCase):
         self.assertAlmostEqual(var['float'], 123.45)
         self.assertEqual(var['integer'], 67)
 
+    def test_payload_wrong_parsing(self):
+        """Test that non-matching expressions fail gracefully."""
+        msg = MQTTMessage.objects.last()
+        var = msg.parse_payload('^xxx(?P<time>[\S]+)\s+(?P<s_string>[\S]+)\s+(?P<f_float>[0-9.]+)\s+(?P<d_integer>[0-9]+)')
+        self.assertIsNone(var)
+        var = msg.parse_payload('^(?P<time>[\S]+)\s+(?P<d_dstring>[\S]+)\s+(?P<f_float>[0-9.]+)\s+(?P<d_integer>[0-9]+)')
+        self.assertIsNone(var['dstring'])
+
 class SubscriptionTests(TestCase):
     """General tests for the subscription models"""
 
