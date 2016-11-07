@@ -155,7 +155,7 @@ class MQTTMessage(models.Model):
 
             d,i:        int(match)
             e,E,f,g:    float(match)
-            s           string, i.e. no interpretation
+            s:          string, i.e. no interpretation
 
         Named groups that do not start with the 'd_' form are interpreted as strings.
 
