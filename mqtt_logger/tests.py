@@ -139,7 +139,7 @@ class RESTTests(TestCase):
         sub = MQTTSubscription(server='broker.hivemq.com', topic=topic)
         sub.save()
         cls.url = reverse('mqtt_logger:messages', kwargs={'topic': topic})
-        for payload in ('_A_', '_B_', '_C_'):
+        for payload in ('_A_123', '_B_123', '_C_123'):
             msg = MQTTMessage(subscription=sub, topic=topic, payload=payload)
             msg.save()
         for level in ('A', 'B', 'C'):
@@ -213,7 +213,7 @@ class RESTTests(TestCase):
         self.assertIn('_B_', response.content)
         self.assertNotIn('_C_', response.content)
 
-    def test_regex(self):
+    def test_topic_wildcards(self):
         """Test whether topic matching with '+' and '#' works."""
 
         client = self.client
@@ -236,3 +236,23 @@ class RESTTests(TestCase):
         self.assertNotIn('_A_', response.content)
         self.assertIn('_B_', response.content)
         self.assertIn('_C_', response.content)
+
+    def test_payload_parsing(self):
+        """Test payload parsing."""
+
+        client = self.client
+        response = client.get(type(self).url, {'format': 'txt', 'parse': '_._(?P<d_number>\d+)'})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('text/plain', response.accepted_media_type)
+        self.assertIn('_A_', response.content)
+        self.assertIn('number', response.content)
+
+    def test_bad_payload_parsing(self):
+        """Test that bad regexes fail gracefully."""
+
+        client = self.client
+        response = client.get(type(self).url, {'format': 'txt', 'parse': '_._(?P<d_+number>\d+)'})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('text/plain', response.accepted_media_type)
+        self.assertIn('_A_', response.content)
+        self.assertNotIn('number', response.content)
