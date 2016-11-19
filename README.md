@@ -22,7 +22,9 @@ The messages can be accessed via a REST API:
 
     http://localhost:8000/mqtt/messages/topic/you/want?format=txt&limit=5&skip=0&parse=<regex>
 
-The `format` must be one of 'txt', 'csv', 'json'.
+The `format` must be one of 'txt', 'csv', 'json', 'html'.
+If the format is 'html' or not specified, a html page with a table of the data and links to the other formats will be returned.
+
 The message payloads can optionally be parsed with a regular expression provided with the `parse` argument.
 It accepts standard Python regular expressions.
 All *named* groups in the expression will be added as additional columns to the output data.
