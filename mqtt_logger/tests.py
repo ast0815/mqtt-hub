@@ -151,6 +151,17 @@ class RESTTests(TestCase):
         """Create a client and other stuff that will be needed for view testing."""
         self.client = Client()
 
+    def test_html_renderer(self):
+        """Test the text renderer of the REST view."""
+
+        client = self.client
+        response = client.get(type(self).url, {'format': 'html'})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('text/html', response.accepted_media_type)
+        self.assertIn('_A_', response.content)
+        self.assertIn('_B_', response.content)
+        self.assertIn('_C_', response.content)
+
     def test_text_renderer(self):
         """Test the text renderer of the REST view."""
 

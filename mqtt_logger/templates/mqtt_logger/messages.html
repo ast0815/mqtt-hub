@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MQTT Messages: {{ topic }}</title>
+</head>
+<body>
+    <h1>MQTT Messages: {{ topic }}</h1>
+
+    <h2>Download</h2>
+
+    <div><ul>
+    {% for fmt in available_formats %}
+        <li><a href="{{url}}?limit={{limit}}&skip={{skip}}&parse={{parse}}&format={{fmt}}">As {{fmt}}</a></li>
+    {% endfor %}
+    </ul></div>
+
+    <h2>Table</h2>
+    <div>{{ table | safe }}</div>
+</body>
+</html>

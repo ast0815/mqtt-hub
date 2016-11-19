@@ -11,6 +11,7 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = MQTTMessage
         fields = ['id', 'time_recorded', 'topic', 'payload']
+        pandas_index = ['time_recorded', 'topic', 'id']
 
 def generate_parsing_serializer_class(regex):
     """Generate a serializer class from a regular expression."""

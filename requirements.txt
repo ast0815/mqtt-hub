@@ -1,4 +1,4 @@
 django>=1.10.3
 paho-mqtt>=1.2
 djangorestframework
-rest-pandas
+rest-pandas>=0.5

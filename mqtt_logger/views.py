@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from rest_pandas.views import PandasView
-from rest_pandas.renderers import PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer
+from rest_pandas.renderers import PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer, PandasHTMLRenderer
 from .models import MQTTMessage
 from .serializers import generate_parsing_serializer_class
 
@@ -18,13 +18,39 @@ class MessageView(PandasView):
     Query strings
     -------------
 
-    * `format`  : Set the file format to be returned. One of 'txt', 'csv', 'json'.
+    * `format`  : Set the file format to be returned. One of 'txt', 'csv', 'json', 'html'.
     * `limit`   : Limit the number of returned messages.
     * `skip`    : Skip the first N entries.
     * `parse`   : Regular expression to parse the messages' payload.
                   See `MQTTMessage.parse_payload`.
 
     """
+
+    class HTMLRenderer(PandasHTMLRenderer):
+        """Class that renders the messages as a HTML page."""
+
+        template_name = "mqtt_logger/messages.html"
+
+        def get_template_context(self, data, renderer_context):
+            """Add additional variables to the context."""
+
+            view = renderer_context['view']
+            request = renderer_context['request']
+            kwargs = renderer_context['kwargs']
+
+            # Get context from parent class
+            context = PandasHTMLRenderer.get_template_context(self, data, renderer_context)
+
+            # Add usefull variables
+            context['topic'] = kwargs.get('topic', '')
+            context['format'] = request.GET.get('format', 'html')
+            context['limit'] = request.GET.get('limit', 0)
+            context['skip'] = request.GET.get('skip', 0)
+            context['parse'] = request.GET.get('parse', '')
+
+            return context
+
+    renderer_classes = [HTMLRenderer, PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer]
 
     def get_queryset(self):
         """Get the queryset that will be rendered.
@@ -71,5 +97,3 @@ class MessageView(PandasView):
 
         cls = generate_parsing_serializer_class(regex)
         return self.with_list_serializer(cls)
-
-    renderer_classes = [PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer]
