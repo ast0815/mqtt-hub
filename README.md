@@ -25,7 +25,7 @@ The messages can be accessed via a REST API:
 The `format` must be one of 'txt', 'csv', 'json'.
 The message payloads can optionally be parsed with a regular expression provided with the `parse` argument.
 It accepts standard Python regular expressions.
-All *named* groups in the expression will ne added as additional columns to the output data.
+All *named* groups in the expression will be added as additional columns to the output data.
 If a group's name starts with one of the following letters and an underscore '_', the group is interpreted as that data type:
 
     d,i:        int(match)
