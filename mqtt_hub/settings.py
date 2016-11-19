@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'rest_framework',
+    'rest_pandas',
     'mqtt_logger.apps.MqttLoggerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
