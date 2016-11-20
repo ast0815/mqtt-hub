@@ -70,6 +70,8 @@ TEMPLATES = [
     },
 ]
 
+MQTT_LOGGER_TEMPLATE = 'mqtt_logger/messages.html'
+
 WSGI_APPLICATION = 'mqtt_hub.wsgi.application'
 
 

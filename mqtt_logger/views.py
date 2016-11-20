@@ -4,6 +4,7 @@ from rest_pandas.views import PandasView
 from rest_pandas.renderers import PandasCSVRenderer, PandasTextRenderer, PandasJSONRenderer, PandasHTMLRenderer
 from .models import MQTTMessage
 from .serializers import generate_parsing_serializer_class
+from .conf import settings
 
 import re
 
@@ -29,7 +30,7 @@ class MessageView(PandasView):
     class HTMLRenderer(PandasHTMLRenderer):
         """Class that renders the messages as a HTML page."""
 
-        template_name = "mqtt_logger/messages.html"
+        template_name = settings.MQTT_LOGGER_TEMPLATE
 
         def get_template_context(self, data, renderer_context):
             """Add additional variables to the context."""
