@@ -99,6 +99,10 @@ class MQTTSubscription(models.Model):
         else:
             return "[%s: %s]"%(self.server, self.topic)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('mqtt_logger:messages', kwargs={'topic': self.topic})
+
 class MQTTMessage(models.Model):
     """Base class to store all MQTT messages"""
 

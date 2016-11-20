@@ -1,6 +1,5 @@
 from django.test import TestCase, Client
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
 import urllib
 
 from .models import MQTTMessage, MQTTSubscription
@@ -138,7 +137,7 @@ class RESTTests(TestCase):
         topic = 'mqtt-hub/tests'
         sub = MQTTSubscription(server='broker.hivemq.com', topic=topic)
         sub.save()
-        cls.url = reverse('mqtt_logger:messages', kwargs={'topic': topic})
+        cls.url = sub.get_absolute_url()
         for payload in ('_A_123', '_B_123', '_C_123'):
             msg = MQTTMessage(subscription=sub, topic=topic, payload=payload)
             msg.save()
