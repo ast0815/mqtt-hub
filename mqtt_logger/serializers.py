@@ -36,7 +36,7 @@ def generate_parsing_serializer_class(regex):
         class_dict['Meta'].fields.append('parsed_'+name)
 
         # Add a method to actually get the value
-        def _f(self, obj):
+        def _f(self, obj, name=name):
             parsed = obj.parse_payload(regex)
             if parsed is None or name not in parsed:
                 return None
