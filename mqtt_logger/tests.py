@@ -138,7 +138,7 @@ class RESTTests(TestCase):
         sub = MQTTSubscription(server='broker.hivemq.com', topic=topic)
         sub.save()
         cls.url = sub.get_absolute_url()
-        for payload in ('_A_123', '_B_123', '_C_123'):
+        for payload in ('_A_12.3', '_B_12.3', '_C_12.3'):
             msg = MQTTMessage(subscription=sub, topic=topic, payload=payload)
             msg.save()
         for level in ('A', 'B', 'C'):
@@ -251,11 +251,14 @@ class RESTTests(TestCase):
         """Test payload parsing."""
 
         client = self.client
-        response = client.get(type(self).url, {'format': 'txt', 'parse': '_._(?P<d_number>\d+)'})
+        response = client.get(type(self).url, {'format': 'txt', 'parse': '_._(?P<d_a>\d+)\.(?P<d_b>\d+)'})
         self.assertEqual(200, response.status_code)
         self.assertEqual('text/plain', response.accepted_media_type)
         self.assertIn('_A_', response.content)
-        self.assertIn('parsed_number', response.content)
+        self.assertIn('parsed_a', response.content)
+        self.assertIn(',12', response.content)
+        self.assertIn('parsed_b', response.content)
+        self.assertIn(',3', response.content)
 
     def test_bad_payload_parsing(self):
         """Test that bad regexes fail gracefully."""
