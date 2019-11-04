@@ -1,0 +1,10 @@
+{% load static %}
+{% if settings.MQTT_PLOTTER_USE_JSDELIVR %}
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@4"></script>
+{% else %}
+<script src="{% static "mqtt_plotter/vega.js" %}"></script>
+<script src="{% static "mqtt_plotter/vega-lite.js" %}"></script>
+<script src="{% static "mqtt_plotter/vega-embed.js" %}"></script>
+{% endif %}

@@ -19,4 +19,5 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^mqtt/', include('mqtt_logger.urls', namespace='mqtt_logger')),
+    url(r'^plots/', include('mqtt_plotter.urls', namespace='mqtt_plotter')),
 ]

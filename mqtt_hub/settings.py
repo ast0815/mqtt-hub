@@ -34,15 +34,18 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_pandas',
     'mqtt_logger.apps.MqttLoggerConfig',
+    'mqtt_plotter',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,6 +74,7 @@ TEMPLATES = [
 ]
 
 MQTT_LOGGER_TEMPLATE = 'mqtt_logger/messages.html'
+#MQTT_PLOTTER_USE_JSDELIVR = True
 
 WSGI_APPLICATION = 'mqtt_hub.wsgi.application'
 
@@ -123,3 +127,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Headers to allow external websites to use API
+# https://github.com/zestedesavoir/django-cors-middleware
+
+CORS_ORIGIN_ALLOW_ALL = True
