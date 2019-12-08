@@ -1,4 +1,9 @@
-django>=1.10.3
-paho-mqtt>=1.2
-djangorestframework
-rest-pandas>=0.5
+Django==1.11.25
+djangorestframework==3.9.4
+numpy==1.16.5
+paho-mqtt==1.5.0
+pandas==0.24.2
+python-dateutil==2.8.0
+pytz==2019.3
+rest-pandas==1.1.0
+six==1.12.0
