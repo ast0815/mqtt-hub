@@ -2,14 +2,16 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import *
+from django.utils.html import format_html
+from . import models
 
 # Register your models here.
 class PlotAdmin(admin.ModelAdmin):
-    pass
-    #list_display = ('server', 'topic', 'active')
-    #list_editable = ('active',)
-    #list_filter = ('server', 'active')
-    #ordering = ('server', 'topic')
+    readonly_fields = ('simple_link',)
 
-admin.site.register(MQTTPlot, PlotAdmin)
+    def simple_link(self, instance):
+        """Return a link to the simple view."""
+        url = instance.simple_url()
+        return format_html('<a href="{0}" target="_blank">{1}</a>', url, url)
+
+admin.site.register(models.MQTTPlot, PlotAdmin)
