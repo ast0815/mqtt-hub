@@ -6,9 +6,6 @@ python:
 # We don't need sudo
 sudo: false
 
-addons:
-  srcclr: true
-
 # command to run prerequisites
 before_install:
   - pip install cython
